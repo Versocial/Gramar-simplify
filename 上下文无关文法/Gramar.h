@@ -3,6 +3,7 @@
 #include<vector>
 #include<set>
 #include <iostream>
+#include<string>
 
 using namespace::std;
 class Gramar {
@@ -11,13 +12,15 @@ private:
 	set<string>T;
 	string start;
 	string epsilon;
-	unordered_map<string, vector<string>> P;
+	unordered_map<string, set<vector<string>>> P;
+
+	set<vector<string>>& manageLine(const string& line, string& n);//
 
 	static void printSet(const set<string>& set, ostream& out);
 	static bool belongsN(const string& label);
 	static bool belongsT(const string& label);
 
-	//static string getLabel(istream& input);
+	static string getLabel(istream& input,char& c);
 	static bool canBeN(const string& label);
 	static bool canBeT(const string& label);
 public:
