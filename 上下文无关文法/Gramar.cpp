@@ -2,28 +2,28 @@
 #define _END_SIG "@"
 #define _EPSILON_IN '#'
 
-set<vector<string>>& Gramar::manageLine(const string& line, string& n)
+set<production> Gramar::manageLine(const string& line, string& n)
 {
-	set<vector<string>>ans;
+	set<production>ans;
 	n = "";
 	vector<string > production;
-	string temp = "";
+	string symbol = "";
 	int flag = 1;
-	int num = line.size();
 	for (char c : line) {
-		num--;
 		if (c == ' ')continue;
-		else if(isalpha(c)) {if(temp.size()>0) production.insert(production.end(),temp); temp = c; }
-		else if (isdigit(c) )temp += c;
-		else if (c == _EPSILON_IN && temp.size() == 0 && production.size() == 0) { temp = c; production.insert(production.end(), temp); ans.insert(production); production.clear(); temp = ""; }
-		else if (c == '=' && flag == 1) { n = temp; temp = ""; flag = 0; continue; }
-		else if (flag == 0 && (c == '|' || num == 0) && production.size() != 0) { ans.insert(production); production.clear(); }
+		else if(isalpha(c)) {if(symbol.size()>0) production.insert(production.end(),symbol); symbol = c; }
+		else if (isdigit(c) )symbol += c;
+		else if (c == _EPSILON_IN && symbol.size() == 0 && production.size() == 0) { ; production.insert(production.end(), epsilon); ans.insert(production); production.clear();  }
+		else if (c == '=' && flag == 1) { n = symbol; symbol = ""; flag = 0; }
+		else if (flag == 0 && c == '|' && production.size() != 0) {if(symbol.size()>0) production.insert(production.end(), symbol); ans.insert(production); production.clear(); symbol = ""; }
 		else { n = ""; return ans; }
 	}
+	if(symbol.size()>0)production.insert(production.end(), symbol);
+	if(production.size()>0)ans.insert(production); 
 	return ans;
 }
 
-void Gramar::printSet(const set<string>& set, ostream& out)
+void Gramar::printSet(const set<symbol>& set, ostream& out)
 {
 	out << "{ ";
 	int num = set.size();
@@ -34,17 +34,17 @@ void Gramar::printSet(const set<string>& set, ostream& out)
 	} out << " }";
 }
 
-bool Gramar::belongsN(const string& label)
+bool Gramar::belongsN(const symbol& label)
 {
 	return 'A'<=label[0]&&label[0]<='Z';
 }
 
-bool Gramar::belongsT(const string& label)
+bool Gramar::belongsT(const symbol& label)
 {
 	return 'a'<=label[0]&&label[0]<='z';
 }
 
-string Gramar::getLabel(istream& input,char&c)
+symbol Gramar::getLabel(istream& input,char&c)
 {
 	string exit = _END_SIG;
 	string ans="";
@@ -64,7 +64,7 @@ string Gramar::getLabel(istream& input,char&c)
 	return ans;
 }
 
-bool Gramar::canBeN(const string& label)
+bool Gramar::canBeN(const symbol& label)
 {
 	if (label[0] > 'Z' || label[0] < 'A')return false;
 	for (int i = 1; i <label.size();i++) {
@@ -73,7 +73,7 @@ bool Gramar::canBeN(const string& label)
 	return true;
 }
 
-bool Gramar::canBeT(const string& label)
+bool Gramar::canBeT(const symbol& label)
 {
 	if (label[0] > 'z' || label[0] < 'a')return false;
 	for (int i = 1; i < label.size(); i++) {
@@ -98,7 +98,7 @@ int Gramar::initByInput(istream& input, ostream& cout)
 	cout << ">>The G=( N , T , P , S), using \"" << epsilon << "\" to presents 'epsilon' " << endl;
 	cout << ">>Please enter elements of N , which can be a capital letter following a subscript number, eg. \"A\", or \"A32\" will be OK.\n";
 	cout << ">>You can mark the end of N by type in \"" << _END_SIG << "\".\n";
-	for (string n = ""; n != _END_SIG; input >> n) {
+	for (string n = ""; n != _END_SIG&&!input.eof(); input >> n) {
 		if (n == "")continue;
 		if (n == _END_SIG)break;
 		if (canBeN(n)) {
@@ -135,23 +135,29 @@ int Gramar::initByInput(istream& input, ostream& cout)
 	//.....
 	cout << ">>Please enter the P by format like \"A=A1A2A3abc , and use '"<<_EPSILON_IN<<"' to presents 'epsilon' here \"\n";
 	string line="";
-	string n;
+	string n="";
 	while (1) {
 		getline(input, line);
 		if (line=="")continue;
 		if (line == _END_SIG)break;
-		set<vector<string>> productions = manageLine(line, n);
+		set<production> productions = manageLine(line, n);
+
 		if (n == "") {
 			cout << " :: The input is out of format.\n"; continue;
 		}
 		else if (!N.count(n))cout << " :: The \"" << n << "\" is not element of set N.\n";
 		else {
-			for (vector<string> production : productions) {
+			for (set<production>::iterator it = productions.begin(); it != productions.end();) {
 				bool flag = true;
-				for (string symbol : production) {
-					if (!T.count(symbol)) { cout << " :: The \""<<symbol<<"\" is not element of set T.\n"; flag = false; break; }
+				for (string symbol : *it) {
+					if (!T.count(symbol)&&!N.count(symbol)&&epsilon!=symbol) {
+						cout << " :: The \"" << symbol << "\" is not element of set T.\n";
+						flag = false;
+						break;
+					}
 				}
-				if (!flag) { productions.erase(production); }
+				if (!flag) { it = productions.erase(it); flag = true; }
+				else it++;
 			}
 			if (productions.size() != 0)P[n]=productions;
 		}
@@ -166,8 +172,35 @@ int Gramar::initByInput(istream& input, ostream& cout)
 
 void Gramar::print(ostream& out)
 {
-	out << ">> G =( "; printSet(N, out); out << " , "; printSet(T, out); cout << " , P ," << start<<" )" << endl<<" P : \n";
-
-
+	out << ">> G =( "; printSet(N, out); out << " , "; printSet(T, out); cout << " , P ," << start<<" )" << endl<<"> P : \n";
+	for (unordered_map<symbol, set<production>>::iterator it = P.begin(); it != P.end();it++) {
+		out<<it->first<<" = ";
+		int size = it->second.size();
+		for (production p : it->second) {
+			for (symbol s : p) {
+				cout << s;
+			}
+			size--;
+			if (size > 0)cout << "|";
+			else cout << endl;			
+		}
+	}
+	cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
 }
+/*
+* 
+* S→a|bA|B|ccD
+A→abB|ε
+B→aA
+C→ddC
+D→ddd
 
+S A B C D @
+a b c d @
+S
+A=abB|#
+B=aA
+C=ddC
+D=ddd
+@
+*/

@@ -3,26 +3,31 @@
 #include<vector>
 #include<set>
 #include <iostream>
+#include<fstream>
 #include<string>
 
 using namespace::std;
+
+typedef string symbol;
+typedef vector<symbol> production;
+
 class Gramar {
 private:
-	set<string> N;
-	set<string>T;
-	string start;
-	string epsilon;
-	unordered_map<string, set<vector<string>>> P;
+	set<symbol> N;
+	set<symbol>T;
+	symbol start;
+	symbol epsilon;
+	unordered_map<symbol, set<production>> P;
 
-	set<vector<string>>& manageLine(const string& line, string& n);//
+	set<production> manageLine(const string& line, string& n);//
 
-	static void printSet(const set<string>& set, ostream& out);
-	static bool belongsN(const string& label);
-	static bool belongsT(const string& label);
+	static void printSet(const set<symbol>& set, ostream& out);
+	static bool belongsN(const symbol& label);
+	static bool belongsT(const symbol& label);
 
-	static string getLabel(istream& input,char& c);
-	static bool canBeN(const string& label);
-	static bool canBeT(const string& label);
+	static symbol getLabel(istream& input,char& c);
+	static bool canBeN(const symbol& label);
+	static bool canBeT(const symbol& label);
 public:
 	Gramar();
 	~Gramar();
