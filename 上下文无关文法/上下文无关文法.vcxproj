@@ -142,8 +142,8 @@
     <ClInclude Include="Gramar.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Gramar.cpp" />
     <ClCompile Include="GramarIO.cpp" />
+    <ClCompile Include="GramarEliminate.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

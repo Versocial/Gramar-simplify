@@ -30,7 +30,7 @@ private:
 	static bool canBeT(const symbol& label);
 
 	static bool eliminateEpsilonInSet(set<production>&	allProductions,const set<symbol>&epsilonReachableSymbols,symbol epsilon,symbol leftSymbol);
-
+	static bool isProductionMadeBySymbols(const production& p, const set<symbol>& symbols);
 
 public:
 	Gramar();
@@ -40,7 +40,7 @@ public:
 	void eliminateEpsilon();
 	void eliminateSingle();
 
-	void eliminateNotProduction();
-	void eliminateNotReachable();
+	void eliminateNotProductionSymbol();
+	void eliminateNotReachableSymbol();
 	void eliminateUseless();
 };

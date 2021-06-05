@@ -11,4 +11,10 @@ int main() {
 	G.eliminateSingle();
 	cout << ">>The Grammar without single : \n";
 	G.print(cout);
+	G.eliminateNotProductionSymbol();
+	cout << ">>The Grammar without not production symbol : \n";
+	G.print(cout);
+	G.eliminateNotReachableSymbol();
+	cout << ">>The Gramar without unReachable symbol : \n";
+	G.print(cout);
 }
