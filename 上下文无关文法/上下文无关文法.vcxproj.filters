@@ -15,10 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Gramar.cpp">
+    <ClCompile Include="GramarIO.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Gramar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

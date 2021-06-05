@@ -9,7 +9,7 @@
 using namespace::std;
 
 typedef string symbol;
-typedef vector<symbol> production;
+typedef list<symbol> production;
 
 class Gramar {
 private:
@@ -28,12 +28,19 @@ private:
 	static symbol getLabel(istream& input,char& c);
 	static bool canBeN(const symbol& label);
 	static bool canBeT(const symbol& label);
+
+	static bool eliminateEpsilonInSet(set<production>&	allProductions,const set<symbol>&epsilonReachableSymbols,symbol epsilon,symbol leftSymbol);
+
+
 public:
 	Gramar();
 	~Gramar();
 	int initByInput(istream& input, ostream& out);
 	void print(ostream& out);
-	void removeEpsilon();
-	void removeSingle();
-	void removeUseless();
+	void eliminateEpsilon();
+	void eliminateSingle();
+
+	void eliminateNotProduction();
+	void eliminateNotReachable();
+	void eliminateUseless();
 };

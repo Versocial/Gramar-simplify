@@ -5,4 +5,10 @@ int main() {
 	if (!input.is_open()) { cout << "open file error.\n"; };
 	Gramar G;
 	G.initByInput(input, cout);
+	G.eliminateEpsilon();
+	cout << ">>The Gramar without epsilon : \n";
+	G.print(cout);
+	G.eliminateSingle();
+	cout << ">>The Grammar without single : \n";
+	G.print(cout);
 }

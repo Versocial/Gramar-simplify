@@ -2,6 +2,7 @@
 S A B C D @
 a b c d @
 S
+S=a|bA|B|ccD|A
 A=abB|#
 B=aA
 C=ddC
